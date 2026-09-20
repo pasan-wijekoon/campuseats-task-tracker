@@ -14,16 +14,27 @@ namespace CampusEatsTaskTracker.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
-
             modelBuilder.Entity<TaskItem>(entity =>
             {
                 entity.HasKey(e => e.Id);
+
+                // Use Fluent API as single source of truth for constraints
                 entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
                 entity.Property(e => e.Description).HasMaxLength(1000);
-                entity.Property(e => e.Priority).HasConversion<string>();
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()");
-                entity.Property(e => e.UpdatedAt).HasDefaultValueSql("NOW()");
+
+                // Changed to integer storage for performance and maintainability
+                entity.Property(e => e.Priority).HasConversion<int>();
+
+                // Use standard SQL for portability
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                // Index for performance on frequently filtered columns
+                entity.HasIndex(e => e.Priority);
+                entity.HasIndex(e => e.DueDate);
+
+                // Global query filter for soft delete
+                entity.HasQueryFilter(t => !t.IsDeleted);
             });
         }
     }
