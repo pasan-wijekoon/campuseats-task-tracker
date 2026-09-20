@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  # ── Web Application ──────────────────────────────────────────────────────
+  web:
+    build:
+      context: ./CampusEatsTaskTracker
+      dockerfile: Dockerfile
+    container_name: campuseats_web
+    ports:
+      - "5000:80"          # Host port 5000 → container port 80
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=taskdb;Username=postgres;Password=StrongPassword123!
+    restart: unless-stopped
+
+  # ── PostgreSQL Database ──────────────────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    container_name: campuseats_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: StrongPassword123!
+      POSTGRES_DB: taskdb
+    ports:
+      - "5432:5432"        # Expose Postgres so you can connect via pgAdmin/DBeaver
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d taskdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+    driver: local
