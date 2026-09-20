@@ -1,0 +1,55 @@
+@page "{id:int}"
+@model CampusEatsTaskTracker.Pages.Tasks.DetailsModel
+@{
+    ViewData["Title"] = "Task Details";
+    var badgeClass = Model.Task.Priority switch
+    {
+        CampusEatsTaskTracker.Models.Priority.Critical => "bg-danger",
+        CampusEatsTaskTracker.Models.Priority.High => "bg-warning text-dark",
+        CampusEatsTaskTracker.Models.Priority.Medium => "bg-primary",
+        _ => "bg-secondary"
+    };
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2 mb-0">👁 Task Details</h1>
+    <a asp-page="./Index" class="btn btn-outline-secondary">← Back to Tasks</a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">@Model.Task.Title</h4>
+        <span class="badge @badgeClass fs-6">@Model.Task.Priority</span>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Description</dt>
+            <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.Task.Description) ? "—" : Model.Task.Description)</dd>
+
+            <dt class="col-sm-3">Status</dt>
+            <dd class="col-sm-9">
+                @if (Model.Task.IsCompleted)
+                {
+                    <span class="badge bg-success fs-6">✓ Completed</span>
+                }
+                else
+                {
+                    <span class="badge bg-warning text-dark fs-6">⏳ Pending</span>
+                }
+            </dd>
+
+            <dt class="col-sm-3">Due Date</dt>
+            <dd class="col-sm-9">@(Model.Task.DueDate.HasValue ? Model.Task.DueDate.Value.ToString("MMMM dd, yyyy") : "—")</dd>
+
+            <dt class="col-sm-3">Created At</dt>
+            <dd class="col-sm-9">@Model.Task.CreatedAt.ToLocalTime().ToString("MMMM dd, yyyy hh:mm tt")</dd>
+
+            <dt class="col-sm-3">Updated At</dt>
+            <dd class="col-sm-9">@Model.Task.UpdatedAt.ToLocalTime().ToString("MMMM dd, yyyy hh:mm tt")</dd>
+        </dl>
+    </div>
+    <div class="card-footer d-flex gap-2">
+        <a asp-page="./Edit" asp-route-id="@Model.Task.Id" class="btn btn-primary">✏️ Edit</a>
+        <a asp-page="./Delete" asp-route-id="@Model.Task.Id" class="btn btn-outline-danger">🗑 Delete</a>
+    </div>
+</div>

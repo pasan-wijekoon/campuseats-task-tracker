@@ -1,0 +1,80 @@
+## ── .NET ──────────────────────────────────────────────────────────────────
+
+# Build output
+bin/
+obj/
+
+# NuGet packages
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Visual Studio files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+# Rider
+.idea/
+
+# VS Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Publish output
+**/publish/
+**/PublishProfiles/
+
+# ASP.NET Core
+*.pfx
+appsettings.Development.json
+
+# Migrations (keep the folder but ignore generated snapshots if desired — commented out)
+# Data/Migrations/
+
+## ── Docker ────────────────────────────────────────────────────────────────
+
+# Docker overrides (local secrets / dev overrides)
+docker-compose.override.yml
+.env
+.env.*
+!.env.example
+
+## ── Logs ──────────────────────────────────────────────────────────────────
+logs/
+*.log
+*.log.*
+
+## ── OS ────────────────────────────────────────────────────────────────────
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
+
+## ── Secrets / Credentials ─────────────────────────────────────────────────
+*.pfx
+*.p12
+*.key
+*.pem
+secrets.json
+appsettings.secrets.json
