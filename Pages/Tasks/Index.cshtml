@@ -1,0 +1,103 @@
+@page
+@model CampusEatsTaskTracker.Pages.Tasks.IndexModel
+@{
+    ViewData["Title"] = "Tasks";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2 mb-0">
+        <span class="me-2">📋</span> CampusEats Task Tracker
+    </h1>
+    <a asp-page="./Create" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-1"></i> Add Task
+    </a>
+</div>
+
+<!-- Filter / search bar -->
+<form method="get" class="row g-2 mb-4">
+    <div class="col-md-5">
+        <input type="text" name="search" value="@Model.Search" class="form-control" placeholder="Search tasks..." />
+    </div>
+    <div class="col-md-3">
+        <select name="filter" class="form-select">
+            <option value="">All Tasks</option>
+            <option value="pending" selected="@(Model.Filter == "pending")">Pending</option>
+            <option value="completed" selected="@(Model.Filter == "completed")">Completed</option>
+        </select>
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-outline-secondary">Filter</button>
+        <a asp-page="./Index" class="btn btn-outline-secondary">Clear</a>
+    </div>
+</form>
+
+@if (!Model.Tasks.Any())
+{
+    <div class="alert alert-info">
+        No tasks found. <a asp-page="./Create">Create your first task!</a>
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Title</th>
+                    <th>Priority</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var task in Model.Tasks)
+                {
+                    <tr class="@(task.IsCompleted ? "table-success text-muted" : "")">
+                        <td>@task.Id</td>
+                        <td>
+                            <strong>@task.Title</strong>
+                            @if (!string.IsNullOrWhiteSpace(task.Description))
+                            {
+                                <br /><small class="text-muted">@task.Description.Substring(0, Math.Min(task.Description.Length, 60))@(task.Description.Length > 60 ? "…" : "")</small>
+                            }
+                        </td>
+                        <td>
+                            @{
+                                var badgeClass = task.Priority switch
+                                {
+                                    CampusEatsTaskTracker.Models.Priority.Critical => "bg-danger",
+                                    CampusEatsTaskTracker.Models.Priority.High => "bg-warning text-dark",
+                                    CampusEatsTaskTracker.Models.Priority.Medium => "bg-primary",
+                                    _ => "bg-secondary"
+                                };
+                            }
+                            <span class="badge @badgeClass">@task.Priority</span>
+                        </td>
+                        <td>@(task.DueDate.HasValue ? task.DueDate.Value.ToString("MMM dd, yyyy") : "-")</td>
+                        <td>
+                            @if (task.IsCompleted)
+                            {
+                                <span class="badge bg-success">✓ Done</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark">Pending</span>
+                            }
+                        </td>
+                        <td><small>@task.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy")</small></td>
+                        <td class="text-center">
+                            <a asp-page="./Details" asp-route-id="@task.Id" class="btn btn-sm btn-outline-info me-1" title="Details">👁</a>
+                            <a asp-page="./Edit" asp-route-id="@task.Id" class="btn btn-sm btn-outline-primary me-1" title="Edit">✏️</a>
+                            <a asp-page="./Delete" asp-route-id="@task.Id" class="btn btn-sm btn-outline-danger" title="Delete">🗑</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <p class="text-muted small">Showing @Model.Tasks.Count task(s).</p>
+}
